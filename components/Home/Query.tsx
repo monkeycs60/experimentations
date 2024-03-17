@@ -1,23 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { CMCResponse, CMCData } from '@/types/CMCCryptos';
 
-const API_KEY = 'gXOv59n03MCpY4jTMr64paSObvk4Kt3h';
-
-const fetchExchanges = async () => {
-	const response = await fetch(
-		`https://api.polygon.io/v3/reference/exchanges?asset_class=crypto&locale=global&apiKey=${API_KEY}`
-	);
-	if (!response.ok) {
-		throw new Error('Failed to fetch exchanges');
-	}
-	return response.json();
-};
-
-const fetchCryptoAssets = async () => {
-	const response = await fetch(
-		`https://api.polygon.io/v3/reference/tickers?market=crypto&locale=global&active=true&sort=ticker&order=asc&limit=10&apiKey=${API_KEY}`
-	);
+const fetchCMC = async (): Promise<CMCResponse> => {
+	const response = await fetch('/api/cmc');
 	if (!response.ok) {
 		throw new Error('Failed to fetch crypto assets');
 	}
@@ -25,37 +12,34 @@ const fetchCryptoAssets = async () => {
 };
 
 const Query = () => {
-	const { data, isLoading, isError } = useQuery({
-		queryKey: ['exchanges'],
-		queryFn: fetchExchanges,
-	});
 	const {
-		data: cryptoAssets,
-		isLoading: cryptoAssetsIsLoading,
-		isError: cryptoAssetsIsError,
-	} = useQuery({
-		queryKey: ['cryptoAssets'],
-		queryFn: fetchCryptoAssets,
+		data: cmcData,
+		isLoading,
+		isError,
+		error,
+	} = useQuery<CMCResponse>({
+		queryKey: ['cmc'],
+		queryFn: fetchCMC,
 	});
-	console.log(data);
-	console.log(cryptoAssets);
 
 	if (isLoading) {
 		return <div>Loading...</div>;
 	}
 
 	if (isError) {
-		return <div>Error fetching exchanges</div>;
+		return <div>Error: {error.message}</div>;
 	}
+	console.log(cmcData);
 
 	return (
 		<div>
 			<h1>Crypto Exchanges</h1>
-			{/* <ul>
-			{data.results.map((exchange: unknown) => (
-				<li key={exchange?.id}>{exchange.name}</li>
+			{cmcData?.data.slice(0, 10).map((asset) => (
+				<div key={asset.id}>
+					<p>{asset.name}</p>
+					<p>{asset.quote.USD.price.toFixed(2)}</p>
+				</div>
 			))}
-		</ul> */}
 		</div>
 	);
 };
