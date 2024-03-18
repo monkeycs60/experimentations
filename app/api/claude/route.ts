@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 					content: [
 						{
 							type: 'text',
-							text: `Que penses-tu du prix actuel de ${cryptoName}, qui est de ${cryptoPrice} USD ?`,
+							text: `What do you think about ${cryptoName}, the current price is ${cryptoPrice} USD ? Write a poem about it`,
 						},
 					],
 				},

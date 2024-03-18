@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { CMCResponse, CMCData } from '@/types/CMCCryptos';
-import anthropic from '@/lib/claude';
+import { CMCSpecificCryptoResponse } from '@/types/CMCSpecficCrypto';
 import { useState } from 'react';
 
 const fetchCMC = async (): Promise<CMCResponse> => {
@@ -12,6 +12,8 @@ const fetchCMC = async (): Promise<CMCResponse> => {
 	}
 	return response.json();
 };
+
+
 
 const fetchClaudeOpinion = async (cryptoName: string, cryptoPrice: number) => {
 	const response = await fetch('/api/claude', {
@@ -40,6 +42,8 @@ const Query = () => {
 		queryKey: ['cmc'],
 		queryFn: fetchCMC,
 	});
+
+
 
 	const [claudeOpinion, setClaudeOpinion] = useState('');
 	const [isClaudeLoading, setIsClaudeLoading] = useState(false);

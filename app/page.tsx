@@ -1,6 +1,7 @@
 import { FirstForm } from '@/components/Home/FirstForm';
 import MainSection from '@/components/Home/MainSection';
 import Query from '@/components/Home/Query';
+import { SpecificCryptoForm } from '@/components/Home/SpecificCryptoForm';
 
 export default function Home() {
 	return (
@@ -8,6 +9,7 @@ export default function Home() {
 			<MainSection />
 			<FirstForm />
 			<Query />
+			<SpecificCryptoForm />
 		</main>
 	);
 }
