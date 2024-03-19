@@ -42,7 +42,7 @@ import { CMCData } from '@/types/CMCCryptos';
 
 const fetchSelectedCrypto = async (
 	cryptoSymbol: string
-): Promise<CMCListingResponse> => {
+): Promise<CMCListing[]> => {
 	const response = await fetch('/api/specific-crypto', {
 		method: 'POST',
 		headers: {
@@ -77,7 +77,9 @@ const FormSchema = z.object({
 });
 
 export function SpecificCryptoForm() {
-	const [selectedCrypto, setSelectedCrypto] = useState<CMCData | null>(null);
+	const [selectedCrypto, setSelectedCrypto] = useState<CMCListing | null>(
+		null
+	);
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -104,7 +106,7 @@ export function SpecificCryptoForm() {
 		mutationFn: fetchSelectedCrypto,
 		onSuccess: (data) => {
 			console.log(data);
-			setSelectedCrypto(data.data[0]);
+			setSelectedCrypto(data[0]);
 			console.log(selectedCrypto);
 		},
 	});
@@ -214,13 +216,8 @@ export function SpecificCryptoForm() {
 				<div>
 					<h2>{selectedCrypto.name}</h2>
 					<p>{selectedCrypto.symbol}</p>
-					<p>{selectedCrypto.date_added}</p>
-					<p>{selectedCrypto.platform}</p>
-					<p>{selectedCrypto.slug}</p>
-					<p>{selectedCrypto.tags}</p>
 					<p>{selectedCrypto.cmc_rank}</p>
 					{/* <p>{selectedCrypto.quote[0].market_cap}</p>
-					<p>{selectedCrypto.quote[0].price}</p>
 					<p>{selectedCrypto.quote[0].percent_change_24h}</p> */}
 					<p>{selectedCrypto.total_supply}</p>
 				</div>
