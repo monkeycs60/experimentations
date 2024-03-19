@@ -37,10 +37,12 @@ import { CMCSpecificCryptoResponse } from '@/types/CMCSpecficCrypto';
 import { CMCListingResponse, CMCListing } from '@/types/CMCListingLatest';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { CommandList } from 'cmdk';
+import { CMCData } from '@/types/CMCCryptos';
 
 const fetchSelectedCrypto = async (
 	cryptoSymbol: string
-): Promise<CMCSpecificCryptoResponse> => {
+): Promise<CMCListingResponse> => {
 	const response = await fetch('/api/specific-crypto', {
 		method: 'POST',
 		headers: {
@@ -75,17 +77,13 @@ const FormSchema = z.object({
 });
 
 export function SpecificCryptoForm() {
+	const [selectedCrypto, setSelectedCrypto] = useState<CMCData | null>(null);
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
 			cryptoSymbol: '',
 		},
 	});
-
-	const [selectedCrypto, setSelectedCrypto] =
-		useState<CMCSpecificCryptoResponse | null>(null);
-
-	console.log(selectedCrypto);
 
 	const {
 		data: cryptoListings,
@@ -105,7 +103,9 @@ export function SpecificCryptoForm() {
 	} = useMutation({
 		mutationFn: fetchSelectedCrypto,
 		onSuccess: (data) => {
-			setSelectedCrypto(data);
+			console.log(data);
+			setSelectedCrypto(data.data[0]);
+			console.log(selectedCrypto);
 		},
 	});
 
@@ -149,7 +149,7 @@ export function SpecificCryptoForm() {
 													variant='outline'
 													role='combobox'
 													className={cn(
-														'w-[200px] justify-between',
+														'w-[400px] justify-between',
 														!field.value &&
 															'text-muted-foreground'
 													)}>
@@ -163,36 +163,39 @@ export function SpecificCryptoForm() {
 												</Button>
 											</FormControl>
 										</PopoverTrigger>
-										<PopoverContent className='w-[200px] p-0'>
+										<PopoverContent className='max-h-80 w-[400px] overflow-auto p-0'>
 											<Command>
 												<CommandInput
-													placeholder='Search framework...'
+													placeholder='Search cryptocurrency...'
 													className='h-9'
 												/>
 												<CommandEmpty>No crypto found</CommandEmpty>
-												<CommandGroup>
-													{cryptoListings?.map((crypto) => (
-														<CommandItem
-															value={crypto.name}
-															key={crypto.id}
-															onSelect={() => {
-																form.setValue(
-																	'cryptoSymbol',
-																	crypto.symbol
-																);
-															}}>
-															{crypto.name}
-															<CheckIcon
-																className={cn(
-																	'ml-auto h-4 w-4',
-																	crypto.symbol === field.value
-																		? 'opacity-100'
-																		: 'opacity-0'
-																)}
-															/>
-														</CommandItem>
-													))}
-												</CommandGroup>
+												<CommandList>
+													<CommandGroup>
+														{cryptoListings?.map((crypto) => (
+															<CommandItem
+																value={crypto.name}
+																key={crypto.id}
+																onSelect={() => {
+																	form.setValue(
+																		'cryptoSymbol',
+																		crypto.symbol
+																	);
+																}}>
+																{crypto.name}
+																<CheckIcon
+																	className={cn(
+																		'ml-auto h-4 w-4',
+																		crypto.symbol ===
+																			field.value
+																			? 'opacity-100'
+																			: 'opacity-0'
+																	)}
+																/>
+															</CommandItem>
+														))}
+													</CommandGroup>
+												</CommandList>
 											</Command>
 										</PopoverContent>
 									</Popover>
@@ -209,10 +212,20 @@ export function SpecificCryptoForm() {
 			)}
 			{selectedCrypto && (
 				<div>
-					{/* <h1>{selectedCrypto[0].name}</h1>
-					<p>{selectedCrypto[0].quote.USD.price.toFixed(2)}</p> */}
+					<h2>{selectedCrypto.name}</h2>
+					<p>{selectedCrypto.symbol}</p>
+					<p>{selectedCrypto.date_added}</p>
+					<p>{selectedCrypto.platform}</p>
+					<p>{selectedCrypto.slug}</p>
+					<p>{selectedCrypto.tags}</p>
+					<p>{selectedCrypto.cmc_rank}</p>
+					{/* <p>{selectedCrypto.quote[0].market_cap}</p>
+					<p>{selectedCrypto.quote[0].price}</p>
+					<p>{selectedCrypto.quote[0].percent_change_24h}</p> */}
+					<p>{selectedCrypto.total_supply}</p>
 				</div>
 			)}
+
 			{isError && <p>Error fetching selected crypto.</p>}
 		</>
 	);
