@@ -6,8 +6,19 @@ const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
 export async function GET(request: Request) {
 	try {
 		if (typeof API_KEY === 'string') {
+			const { searchParams } = new URL(request.url);
+			const search = searchParams.get('search') || '';
+
+			console.log(
+				`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?limit=5000${
+					search ? `&slug=${search}` : ''
+				}`
+			);
+
 			const response = await fetch(
-				'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
+				`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?${
+					search ? `&symbol=${search}` : ''
+				}`,
 				{
 					headers: {
 						'X-CMC_PRO_API_KEY': API_KEY,
@@ -20,9 +31,10 @@ export async function GET(request: Request) {
 			}
 
 			const data: CMCListingResponse = await response.json();
-			return NextResponse.json({
-				data: data.data,
-			});
+			const cryptoData = Object.values(data.data);
+			const finalData = cryptoData[0];
+
+			return NextResponse.json({ data: finalData });
 		}
 	} catch (error) {
 		console.error('Error fetching data:', error);
