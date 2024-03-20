@@ -9,16 +9,8 @@ export async function GET(request: Request) {
 			const { searchParams } = new URL(request.url);
 			const search = searchParams.get('search') || '';
 
-			console.log(
-				`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?limit=5000${
-					search ? `&slug=${search}` : ''
-				}`
-			);
-
 			const response = await fetch(
-				`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?${
-					search ? `&symbol=${search}` : ''
-				}`,
+				`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?&symbol=${search}`,
 				{
 					headers: {
 						'X-CMC_PRO_API_KEY': API_KEY,

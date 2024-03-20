@@ -31,35 +31,11 @@ import {
 	FormLabel,
 	FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
-import { CMCSpecificCryptoResponse } from '@/types/CMCSpecficCrypto';
 import { CMCListingResponse, CMCListing } from '@/types/CMCListingLatest';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { CommandList } from 'cmdk';
-import { CMCData } from '@/types/CMCCryptos';
-import { log } from 'console';
-
-const fetchSelectedCrypto = async (
-	cryptoSymbol: string
-): Promise<CMCListing[]> => {
-	console.log(cryptoSymbol);
-	const response = await fetch('/api/specific-crypto', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ cryptoSymbol }),
-	});
-
-	if (!response.ok) {
-		throw new Error('Failed to fetch selected crypto');
-	}
-
-	const data = await response.json();
-	return data.data;
-};
 
 const fetchCryptoListings = async (
 	searchParam: string
@@ -97,6 +73,7 @@ export function SpecificCryptoForm() {
 	});
 
 	const [searchTerm, setSearchTerm] = useState('');
+	console.log({ searchTerm });
 
 	const {
 		data: cryptoListings,
@@ -109,19 +86,6 @@ export function SpecificCryptoForm() {
 	});
 
 	console.log(cryptoListings);
-
-	const {
-		mutate: fetchCrypto,
-		isError,
-		error,
-	} = useMutation({
-		mutationFn: fetchSelectedCrypto,
-		onSuccess: (data) => {
-			console.log(data);
-			setSelectedCrypto(data[0]);
-			console.log(selectedCrypto);
-		},
-	});
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		console.log(data);
@@ -235,13 +199,10 @@ export function SpecificCryptoForm() {
 					<h2>{selectedCrypto.name}</h2>
 					<p>{selectedCrypto.symbol}</p>
 					<p>{selectedCrypto.cmc_rank}</p>
-					{/* <p>{selectedCrypto.quote[0].market_cap}</p>
-					<p>{selectedCrypto.quote[0].percent_change_24h}</p> */}
+					<p>{selectedCrypto.quote['USD'].price}</p>
 					<p>{selectedCrypto.total_supply}</p>
 				</div>
 			)}
-
-			{isError && <p>Error fetching selected crypto.</p>}
 		</>
 	);
 }
