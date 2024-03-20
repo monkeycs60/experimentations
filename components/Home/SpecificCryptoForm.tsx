@@ -81,8 +81,9 @@ export function SpecificCryptoForm() {
 		isError: isListingsError,
 	} = useQuery<CMCListing[]>({
 		queryKey: ['cryptoListings', searchTerm],
-		queryFn: () => fetchCryptoListings(searchTerm),
+		queryFn: async () => fetchCryptoListings(searchTerm),
 		enabled: searchTerm.length > 2,
+		staleTime: 60 * 1000,
 	});
 
 	console.log(cryptoListings);
