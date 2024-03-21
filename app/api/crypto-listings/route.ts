@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { CMCListing, CMCListingResponse } from '@/types/CMCListingLatest';
+import { CMCResponse } from '@/types/CMCCryptos';
 
 const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
+const MAX_CRYPTOS = 1000;
+const CRYPTOS_PER_REQUEST = 200;
 
 export async function GET(request: Request) {
 	try {
@@ -10,7 +13,7 @@ export async function GET(request: Request) {
 			const search = searchParams.get('search') || '';
 
 			const response = await fetch(
-				`https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?&symbol=${search}`,
+				'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=200',
 				{
 					headers: {
 						'X-CMC_PRO_API_KEY': API_KEY,
@@ -19,14 +22,30 @@ export async function GET(request: Request) {
 			);
 
 			if (!response.ok) {
-				throw new Error('Failed to fetch data from CoinMarketCap API');
+				throw new Error(
+					'Failed to fetch data from in the back end route API'
+				);
 			}
 
-			const data: CMCListingResponse = await response.json();
-			const cryptoData = Object.values(data.data);
-			const finalData = cryptoData[0];
+			const data: CMCResponse = await response.json();
+			const mediumData: CMCListing[] = data.data;
+			const finalData: CMCListing[] = mediumData.filter((crypto) =>
+				crypto.name.toLowerCase().includes(search.toLowerCase())
+			);
+			console.log(finalData);
 
-			return NextResponse.json({ data: finalData });
+			if (finalData.length === 0) {
+				const response = await fetch(
+					'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=200?start=200',
+					{
+						headers: {
+							'X-CMC_PRO_API_KEY': API_KEY,
+						},
+					}
+				);
+			}
+
+			return NextResponse.json({ data: mediumData });
 		}
 	} catch (error) {
 		console.error('Error fetching data:', error);

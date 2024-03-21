@@ -36,6 +36,7 @@ import { CMCListingResponse, CMCListing } from '@/types/CMCListingLatest';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { CommandList } from 'cmdk';
+import { CMCResponse } from '@/types/CMCCryptos';
 
 const fetchCryptoListings = async (
 	searchParam: string
@@ -44,8 +45,10 @@ const fetchCryptoListings = async (
 
 	const response = await fetch(`/api/crypto-listings?search=${searchParam}`);
 
+	console.log(response);
+
 	if (!response.ok) {
-		throw new Error('Failed to fetch crypto listings');
+		throw new Error('Failed to fetch from the fetch func crypto listings');
 	}
 
 	const data = await response.json();
@@ -63,8 +66,6 @@ export function SpecificCryptoForm() {
 		null
 	);
 
-	console.log(selectedCrypto);
-
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -73,7 +74,6 @@ export function SpecificCryptoForm() {
 	});
 
 	const [searchTerm, setSearchTerm] = useState('');
-	console.log({ searchTerm });
 
 	const {
 		data: cryptoListings,

@@ -13,8 +13,6 @@ const fetchCMC = async (): Promise<CMCResponse> => {
 	return response.json();
 };
 
-
-
 const fetchClaudeOpinion = async (cryptoName: string, cryptoPrice: number) => {
 	const response = await fetch('/api/claude', {
 		method: 'POST',
@@ -43,8 +41,6 @@ const Query = () => {
 		queryFn: fetchCMC,
 	});
 
-
-
 	const [claudeOpinion, setClaudeOpinion] = useState('');
 	const [isClaudeLoading, setIsClaudeLoading] = useState(false);
 
@@ -71,7 +67,6 @@ const Query = () => {
 	if (isError) {
 		return <div>Error: {error.message}</div>;
 	}
-	console.log(cmcData);
 
 	return (
 		<div>
