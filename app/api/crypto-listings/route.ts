@@ -3,8 +3,7 @@ import { CMCListing, CMCListingResponse } from '@/types/CMCListingLatest';
 import { CMCResponse } from '@/types/CMCCryptos';
 
 const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
-const MAX_CRYPTOS = 1000;
-const CRYPTOS_PER_REQUEST = 200;
+
 
 export async function GET(request: Request) {
 	try {
