@@ -23,18 +23,18 @@ async function populateDb(): Promise<any> {
 const MainSection = () => {
 	// const session = await auth();
 
-	const {
-		data: cmcPopulate,
-		isLoading,
-		isError,
-		error,
-	} = useQuery<CMCResponse>({
-		queryKey: ['populate'],
-		queryFn: async () => populateDb(),
-		staleTime: 60 * 1000,
-	});
+	// const {
+	// 	data: cmcPopulate,
+	// 	isLoading,
+	// 	isError,
+	// 	error,
+	// } = useQuery<CMCResponse>({
+	// 	queryKey: ['populate'],
+	// 	queryFn: async () => populateDb(),
+	// 	staleTime: 60 * 1000,
+	// });
 
-	console.log(cmcPopulate);
+	// console.log(cmcPopulate);
 
 	return (
 		<>
