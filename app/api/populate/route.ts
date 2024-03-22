@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
 
-export async function GET(request: Request) {
+export async function GET(request: Request, response: Response) {
 	try {
 		if (typeof API_KEY === 'string') {
 			const response = await fetch(

@@ -3,7 +3,7 @@ import { CMCResponse } from '@/types/CMCCryptos';
 
 const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
 
-export async function GET() {
+export async function GET(resquest: Request, response: Response) {
 	try {
 		if (typeof API_KEY === 'string') {
 			const response = await fetch(
