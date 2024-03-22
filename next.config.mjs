@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	staticPageGenerationTimeout: 180,
+	staticPageGenerationTimeout: 400,
 };
 
 export default nextConfig;

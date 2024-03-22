@@ -94,12 +94,24 @@ export function SpecificCryptoForm() {
 		}
 	}
 
-	const MAX_RESULTS = 10;
+	const MAX_RESULTS = 20;
 
 	const filteredCryptoListings = cryptoListings
 		?.filter((crypto) =>
 			crypto.name.toLowerCase().includes(searchTerm.toLowerCase())
 		)
+		.sort((a, b) => {
+			if (a.cmcRank && b.cmcRank) {
+				return a.cmcRank - b.cmcRank;
+			}
+			if (a.cmcRank) {
+				return -1;
+			}
+			if (b.cmcRank) {
+				return 1;
+			}
+			return 0;
+		})
 		.slice(0, MAX_RESULTS);
 
 	return (
@@ -162,7 +174,14 @@ export function SpecificCryptoForm() {
 																		crypto.name
 																	);
 																}}>
-																{crypto.name}
+																<div className='flex items-center gap-3'>
+																	<span className=''>
+																		{crypto.name}
+																	</span>
+																	<span className='text-xs font-bold text-black/70'>
+																		({crypto.symbol})
+																	</span>
+																</div>
 																<CheckIcon
 																	className={cn(
 																		'ml-auto h-4 w-4',
