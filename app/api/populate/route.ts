@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 
 const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
 
-export async function GET(request: Request, response: Response) {
+export async function GET(request: Request) {
 	try {
 		if (typeof API_KEY === 'string') {
 			const response = await fetch(
@@ -97,6 +97,11 @@ export async function GET(request: Request, response: Response) {
 			return NextResponse.json(
 				{ message: 'Successfully fetched data from CoinMarketCap API' },
 				{ status: 200 }
+			);
+		} else {
+			return NextResponse.json(
+				{ error: 'API key is missing or invalid' },
+				{ status: 500 }
 			);
 		}
 	} catch (error) {

@@ -3,7 +3,7 @@ import { CMCResponse } from '@/types/CMCCryptos';
 
 const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
 
-export async function GET(resquest: Request, response: Response) {
+export async function GET(resquest: Request) {
 	try {
 		if (typeof API_KEY === 'string') {
 			const response = await fetch(
@@ -21,6 +21,11 @@ export async function GET(resquest: Request, response: Response) {
 
 			const data: CMCResponse = await response.json();
 			return NextResponse.json(data);
+		} else {
+			return NextResponse.json(
+				{ error: 'API key is missing or invalid' },
+				{ status: 500 }
+			);
 		}
 	} catch (error) {
 		console.error('Error fetching data:', error);

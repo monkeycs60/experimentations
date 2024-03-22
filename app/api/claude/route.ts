@@ -6,7 +6,7 @@ const anthropic = new Anthropic({
 	apiKey: process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY,
 });
 
-export async function POST(request: Request, response: Response) {
+export async function POST(request: Request) {
 	const { cryptoName, cryptoPrice } = await request.json();
 
 	try {
