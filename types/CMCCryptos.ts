@@ -17,7 +17,7 @@ export interface CMCData {
 	last_updated: string;
 	date_added: string;
 	tags: string[];
-	platform: null;
+	platform: Platform;
 	self_reported_circulating_supply: null;
 	self_reported_market_cap: null;
 	quote: CMCQuote;
@@ -39,6 +39,14 @@ interface CMCCurrency {
 	market_cap_dominance: number;
 	fully_diluted_market_cap: number;
 	last_updated: string;
+}
+
+interface Platform {
+	id: number;
+	name: string;
+	symbol: string;
+	slug: string;
+	token_address: string;
 }
 
 interface CMCStatus {

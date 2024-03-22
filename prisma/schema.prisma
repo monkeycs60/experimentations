@@ -67,7 +67,7 @@ model Cryptocurrency {
   lastUpdated            DateTime @map("last_updated")
   dateAdded              DateTime @map("date_added")
   tags                   String[]
-  platform               String?  
+  tokenAddress               String?  @map("token_address") 
   selfReportedCirculatingSupply Float? @map("self_reported_circulating_supply")
   selfReportedMarketCap  Float?  @map("self_reported_market_cap")
   price                  Float

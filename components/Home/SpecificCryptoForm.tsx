@@ -41,11 +41,9 @@ import { CMCResponse } from '@/types/CMCCryptos';
 const fetchCryptoListings = async (
 	searchParam: string
 ): Promise<CMCListing[]> => {
-	console.log(searchParam);
 
 	const response = await fetch(`/api/crypto-listings?search=${searchParam}`);
 
-	console.log(response);
 
 	if (!response.ok) {
 		throw new Error('Failed to fetch from the fetch func crypto listings');
