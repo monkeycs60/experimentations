@@ -68,10 +68,9 @@ export function SpecificCryptoForm() {
 	} = useQuery<Cryptocurrency[]>({
 		queryKey: ['cryptoListings'],
 		queryFn: async () => getAllCryptos(),
-		staleTime: 60 * 1000,
+		staleTime: Infinity,
+		enabled: searchTerm.length > 1,
 	});
-
-	console.log(cryptoListings);
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		console.log(data);
@@ -94,6 +93,14 @@ export function SpecificCryptoForm() {
 			});
 		}
 	}
+
+	const MAX_RESULTS = 10;
+
+	const filteredCryptoListings = cryptoListings
+		?.filter((crypto) =>
+			crypto.name.toLowerCase().includes(searchTerm.toLowerCase())
+		)
+		.slice(0, MAX_RESULTS);
 
 	return (
 		<>
@@ -123,7 +130,7 @@ export function SpecificCryptoForm() {
 													!field.value && 'text-muted-foreground'
 												)}>
 												{field.value
-													? cryptoListings?.find(
+													? filteredCryptoListings?.find(
 															(crypto) =>
 																crypto.name === field.value
 													  )?.name
@@ -144,27 +151,30 @@ export function SpecificCryptoForm() {
 											<CommandEmpty>No crypto found</CommandEmpty>
 											<CommandList>
 												<CommandGroup>
-													{cryptoListings?.map((crypto) => (
-														<CommandItem
-															value={crypto.name}
-															key={crypto.id}
-															onSelect={() => {
-																form.setValue(
-																	'cryptoSymbol',
-																	crypto.name
-																);
-															}}>
-															{crypto.name}
-															<CheckIcon
-																className={cn(
-																	'ml-auto h-4 w-4',
-																	crypto.name === field.value
-																		? 'opacity-100'
-																		: 'opacity-0'
-																)}
-															/>
-														</CommandItem>
-													))}
+													{filteredCryptoListings?.map(
+														(crypto) => (
+															<CommandItem
+																value={crypto.name}
+																key={crypto.id}
+																onSelect={() => {
+																	form.setValue(
+																		'cryptoSymbol',
+																		crypto.name
+																	);
+																}}>
+																{crypto.name}
+																<CheckIcon
+																	className={cn(
+																		'ml-auto h-4 w-4',
+																		crypto.name ===
+																			field.value
+																			? 'opacity-100'
+																			: 'opacity-0'
+																	)}
+																/>
+															</CommandItem>
+														)
+													)}
 												</CommandGroup>
 											</CommandList>
 										</Command>
