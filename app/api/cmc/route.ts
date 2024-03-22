@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { CMCResponse } from '@/types/CMCCryptos';
 
-const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY;
+const API_KEY = process.env.CMC_API_KEY;
 
 export async function GET(resquest: Request) {
 	try {
