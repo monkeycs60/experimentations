@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 export async function GET(request: Request) {
 	try {
 		const response = await fetch(
-			'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=5000',
+			'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?limit=3000',
 			{
 				headers: {
 					'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY as string,
