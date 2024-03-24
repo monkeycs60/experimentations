@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { DevTool } from '@hookform/devtools';
 
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 
@@ -36,12 +35,15 @@ import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { CommandList } from 'cmdk';
-import { CryptoDataGecko } from '@prisma/client';
 import { GeckoCoinID } from '@/types/geckoCoinID';
 import { getAllCryptos } from '@/actions/getAllCryptos';
 import { getSpecificCrypto } from '@/actions/getSpecificCrypto';
+import { GeckoCoinsList } from '@/types/geckoCoinsList';
+import { addCryptoToPortfolio } from '@/actions/addCryptoToPortfolio';
+import Image from 'next/image';
 
 const API_KEY = process.env.COINGECKO_API_KEY;
+
 
 const FormSchema = z.object({
 	cryptoId: z.string(),
@@ -51,7 +53,9 @@ const FormSchema = z.object({
 });
 
 export function SpecificCryptoForm() {
-	const [selectedCrypto, setSelectedCrypto] = useState<CryptoDataGecko | null>(
+	const [open, setOpen] = useState(false);
+
+	const [selectedCrypto, setSelectedCrypto] = useState<GeckoCoinsList | null>(
 		null
 	);
 
@@ -72,7 +76,7 @@ export function SpecificCryptoForm() {
 		data: coinsList,
 		isLoading: isCoinsListLoading,
 		isError: isCoinsListError,
-	} = useQuery<CryptoDataGecko[]>({
+	} = useQuery<GeckoCoinsList[]>({
 		queryKey: ['coinsList'],
 		queryFn: async () => {
 			const data = await getAllCryptos();
@@ -95,7 +99,7 @@ export function SpecificCryptoForm() {
 		staleTime: Infinity,
 	});
 	console.log(specificCrypto);
-	console.log(selectedCrypto?.cryptoId);
+	console.log(selectedCrypto?.id);
 	const watchCryptoId = form.watch('cryptoId');
 	console.log(watchCryptoId);
 
@@ -111,9 +115,13 @@ export function SpecificCryptoForm() {
 			setSelectedCrypto(selectedCrypto);
 			const fetchedCrypto = await getSpecificCrypto(selectedCrypto.id);
 			console.log(fetchedCrypto);
+
+			fetchedCrypto && (await addCryptoToPortfolio(fetchedCrypto));
 			toast({
 				title: 'Fetched selected crypto data',
 			});
+
+			console.log('Fetched selected crypto:', fetchedCrypto);
 
 			return fetchedCrypto;
 		} catch (error) {
@@ -125,8 +133,6 @@ export function SpecificCryptoForm() {
 		}
 	}
 
-	console.log(specificCrypto);
-
 	const MAX_RESULTS = 25;
 
 	const filteredCryptoListings = coinsList
@@ -137,16 +143,6 @@ export function SpecificCryptoForm() {
 
 	return (
 		<div>
-			{isCoinsListLoading && <p>Loading...</p>}
-			{isCoinsListError && <p>Error fetching crypto listings.</p>}
-			{specificCrypto && (
-				<div>
-					<p>{specificCrypto.description.en}</p>
-					{/* <p>{specificCrypto.description}</p> */}
-					<img src={specificCrypto.image.large} alt='' />
-				</div>
-			)}
-
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
@@ -157,10 +153,10 @@ export function SpecificCryptoForm() {
 						render={({ field }) => (
 							<FormItem className='flex flex-col'>
 								<FormLabel>
-									Crypto Symbol
+									Add a crypto to your portfolio{' '}
 									<span className='text-red-500'>*</span>
 								</FormLabel>
-								<Popover>
+								<Popover open={open} onOpenChange={setOpen}>
 									<PopoverTrigger asChild>
 										<FormControl>
 											<Button
@@ -206,6 +202,7 @@ export function SpecificCryptoForm() {
 																		'cryptoId',
 																		crypto.id
 																	);
+																	setOpen(false);
 																}}>
 																<div className='flex items-center gap-2'>
 																	<span className=''>
@@ -235,19 +232,25 @@ export function SpecificCryptoForm() {
 									</PopoverContent>
 								</Popover>
 								<FormDescription>
-									Enter the symbol of the crypto you want to fetch.
+									Enter the name of a cryptocurrency
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
-					<Button type='submit'>Submit</Button>
+					<Button type='submit'>Add to your portfolio</Button>
 				</form>
 			</Form>
-			{selectedCrypto && (
+			{specificCrypto && (
 				<div>
-					<h2>{selectedCrypto.name}</h2>
-					<p>{selectedCrypto.symbol}</p>
+					<p>{specificCrypto.description.en}</p>
+					{/* <p>{specificCrypto.description}</p> */}
+					<Image
+						src={specificCrypto.image.large}
+						width={60}
+						height={60}
+						alt='crypto logo'
+					/>
 				</div>
 			)}
 		</div>

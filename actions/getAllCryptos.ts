@@ -1,6 +1,8 @@
-import { CryptoDataGecko } from '@prisma/client';
+'use server';
 
-export async function getAllCryptos(): Promise<CryptoDataGecko[] | undefined> {
+import { GeckoCoinsList } from '@/types/geckoCoinsList';
+
+export async function getAllCryptos(): Promise<GeckoCoinsList[] | undefined> {
 	try {
 		const response = await fetch(
 			'https://api.coingecko.com/api/v3/coins/list',
@@ -20,7 +22,7 @@ export async function getAllCryptos(): Promise<CryptoDataGecko[] | undefined> {
 			);
 		}
 
-		const data: CryptoDataGecko[] = await response.json();
+		const data: GeckoCoinsList[] = await response.json();
 		return data;
 	} catch (error) {
 		console.error('Error fetching data:', error);

@@ -43,6 +43,8 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  portfolio     UserPortfolio?  @relation(fields: [portfolioId], references: [id])
+  portfolioId   String?         @unique
 }
 
 model VerificationToken {
@@ -53,39 +55,26 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Cryptocurrency {
-  id                     Int      @id
-  name                   String
-  symbol                 String
-  slug                   String
-  cmcRank                Int      @map("cmc_rank")
-  numMarketPairs         Int      @map("num_market_pairs")
-  circulatingSupply      Float    @map("circulating_supply")
-  totalSupply            Float    @map("total_supply")
-  maxSupply              Float?   @map("max_supply")
-  infiniteSupply         Boolean  @map("infinite_supply")
-  lastUpdated            DateTime @map("last_updated")
-  dateAdded              DateTime @map("date_added")
-  tags                   String[]
-  tokenAddress               String?  @map("token_address") 
-  selfReportedCirculatingSupply Float? @map("self_reported_circulating_supply")
-  selfReportedMarketCap  Float?  @map("self_reported_market_cap")
-  price                  Float
-  volume24h              Float    @map("volume_24h")
-  volumeChange24h        Float    @map("volume_change_24h")
-  percentChange1h        Float    @map("percent_change_1h")
-  percentChange24h       Float    @map("percent_change_24h")
-  percentChange7d        Float    @map("percent_change_7d")
-  marketCap              Float    @map("market_cap")
-  marketCapDominance     Float    @map("market_cap_dominance")
-  fullyDilutedMarketCap  Float    @map("fully_diluted_market_cap")
-
-  @@map("cryptocurrencies")
+model GeckoCoinID {
+  id         String          @id
+  symbol     String
+  name       String
+  web_slug   String?
+  description Json?
+  image       Json?
+  market_cap_rank                    Int?
+  market_data                        Json?
+  community_data                     Json?
+  developer_data                     Json?
+  last_updated                       DateTime?
+  tickers                            Json?
+  portfolioId       String
+  portfolio         UserPortfolio   @relation(fields: [portfolioId], references: [id])
 }
 
-model CryptoDataGecko {
-  id            String    @id @default(cuid())
-  cryptoId      String
-  name          String
-  symbol        String
+model UserPortfolio {
+  id           String         @id @default(cuid())
+  user         User           @relation(fields: [userId], references: [id])
+  userId       String         @unique
+  geckoCoinIDs GeckoCoinID[]
 }

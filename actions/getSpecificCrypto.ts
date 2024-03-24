@@ -1,3 +1,5 @@
+'use server';
+
 import { GeckoCoinID } from '@/types/geckoCoinID';
 
 export async function getSpecificCrypto(cryptoId: string) {

@@ -2,9 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ReactQueryClientProvider } from '@/components/ReactQueryClientProvider';
 import AuthProvider from '@/components/Login/AuthProvider';
+import Header from '@/components/layout/Header';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
 	title: 'Expérimentations React',
@@ -19,8 +18,13 @@ export default function RootLayout({
 	return (
 		<AuthProvider>
 			<ReactQueryClientProvider>
-				<html lang='en' className='m-auto max-w-7xl py-12'>
-					<body className={inter.className}>{children}</body>
+				<html lang='en'>
+					<body>
+						<Header />
+						<div className='m-auto max-w-6xl space-y-8 bg-slate-200 py-12 xl:max-w-7xl'>
+							{children}
+						</div>
+					</body>
 				</html>
 			</ReactQueryClientProvider>
 		</AuthProvider>
