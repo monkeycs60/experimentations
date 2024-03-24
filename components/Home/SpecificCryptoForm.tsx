@@ -34,12 +34,15 @@ import {
 import { toast } from '@/components/ui/use-toast';
 import { CMCListingResponse, CMCListing } from '@/types/CMCListingLatest';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CommandList } from 'cmdk';
 import { CMCData, CMCResponse } from '@/types/CMCCryptos';
 import prisma from '@/lib/prisma';
 import { Cryptocurrency } from '@prisma/client';
 import { getAllCryptos } from '@/app/actions/getAllCryptos';
+import { getCoinsList } from '@/app/actions/getCoinsList';
+import { GeckoCoinsList } from '@/types/geckoCoinsList';
+import { CryptoDataGecko } from '@prisma/client';
 
 const FormSchema = z.object({
 	cryptoSymbol: z.string().min(3, {
@@ -72,10 +75,20 @@ export function SpecificCryptoForm() {
 		enabled: searchTerm.length > 1,
 	});
 
+	const {
+		data: coinsList,
+		isLoading: isCoinsListLoading,
+		isError: isCoinsListError,
+	} = useQuery<GeckoCoinsList[]>({
+		queryKey: ['coinsList'],
+		queryFn: async () => getCoinsList(),
+		staleTime: Infinity,
+	});
+
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		console.log(data);
 		try {
-			const selectedCrypto = cryptoListings?.find(
+			const selectedCrypto = coinsList?.find(
 				(crypto) => crypto.name === data.cryptoSymbol
 			);
 			if (!selectedCrypto) {
@@ -96,22 +109,22 @@ export function SpecificCryptoForm() {
 
 	const MAX_RESULTS = 20;
 
-	const filteredCryptoListings = cryptoListings
+	const filteredCryptoListings = coinsList
 		?.filter((crypto) =>
 			crypto.name.toLowerCase().includes(searchTerm.toLowerCase())
 		)
-		.sort((a, b) => {
-			if (a.cmcRank && b.cmcRank) {
-				return a.cmcRank - b.cmcRank;
-			}
-			if (a.cmcRank) {
-				return -1;
-			}
-			if (b.cmcRank) {
-				return 1;
-			}
-			return 0;
-		})
+		// .sort((a, b) => {
+		// 	if (a.cmcRank && b.cmcRank) {
+		// 		return a.cmcRank - b.cmcRank;
+		// 	}
+		// 	if (a.cmcRank) {
+		// 		return -1;
+		// 	}
+		// 	if (b.cmcRank) {
+		// 		return 1;
+		// 	}
+		// 	return 0;
+		// })
 		.slice(0, MAX_RESULTS);
 
 	return (
@@ -174,7 +187,7 @@ export function SpecificCryptoForm() {
 																		crypto.name
 																	);
 																}}>
-																<div className='flex items-center gap-3'>
+																<div className='flex items-center gap-2'>
 																	<span className=''>
 																		{crypto.name}
 																	</span>
