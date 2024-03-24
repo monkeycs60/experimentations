@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { DevTool } from '@hookform/devtools';
 
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 
@@ -36,38 +37,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { CommandList } from 'cmdk';
 import { CryptoDataGecko } from '@prisma/client';
+import { GeckoCoinID } from '@/types/geckoCoinID';
+import { getAllCryptos } from '@/actions/getAllCryptos';
+import { getSpecificCrypto } from '@/actions/getSpecificCrypto';
 
-const API_KEY = process.env.CMC_API_KEY;
-
-async function getAllCryptos(): Promise<CryptoDataGecko[] | undefined> {
-	try {
-		const response = await fetch(
-			'https://api.coingecko.com/api/v3/coins/list',
-			{
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'x-cg-demo-api-key': API_KEY as string,
-				},
-				cache: 'no-store',
-			}
-		);
-
-		if (!response.ok) {
-			throw new Error(
-				'Failed to fetch data from coingecko in the back end route API'
-			);
-		}
-
-		const data: CryptoDataGecko[] = await response.json();
-		return data;
-	} catch (error) {
-		console.error('Error fetching data:', error);
-		return undefined;
-	}
-}
+const API_KEY = process.env.COINGECKO_API_KEY;
 
 const FormSchema = z.object({
+	cryptoId: z.string(),
 	cryptoName: z.string().min(3, {
 		message: 'CryptoSymol must be at least 3 characters.',
 	}),
@@ -82,8 +59,12 @@ export function SpecificCryptoForm() {
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
 			cryptoName: '',
+			cryptoId: '',
 		},
 	});
+
+	const { register } = form;
+	register('cryptoId');
 
 	const [searchTerm, setSearchTerm] = useState('');
 
@@ -100,6 +81,24 @@ export function SpecificCryptoForm() {
 		staleTime: Infinity,
 	});
 
+	const {
+		data: specificCrypto,
+		isLoading: isSpecificCryptoLoading,
+		isError: isSpecificCryptoError,
+	} = useQuery<GeckoCoinID>({
+		queryKey: ['specificCrypto', selectedCrypto?.id],
+		queryFn: async () => {
+			const data = await getSpecificCrypto(selectedCrypto?.id as string);
+			return data as GeckoCoinID;
+		},
+		enabled: form.formState.isSubmitted && !form.formState.isSubmitting,
+		staleTime: Infinity,
+	});
+	console.log(specificCrypto);
+	console.log(selectedCrypto?.cryptoId);
+	const watchCryptoId = form.watch('cryptoId');
+	console.log(watchCryptoId);
+
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		console.log(data);
 		try {
@@ -110,9 +109,13 @@ export function SpecificCryptoForm() {
 				throw new Error('Selected crypto not found');
 			}
 			setSelectedCrypto(selectedCrypto);
+			const fetchedCrypto = await getSpecificCrypto(selectedCrypto.id);
+			console.log(fetchedCrypto);
 			toast({
 				title: 'Fetched selected crypto data',
 			});
+
+			return fetchedCrypto;
 		} catch (error) {
 			console.error('Error fetching selected crypto:', error);
 			toast({
@@ -121,6 +124,8 @@ export function SpecificCryptoForm() {
 			});
 		}
 	}
+
+	console.log(specificCrypto);
 
 	const MAX_RESULTS = 25;
 
@@ -131,9 +136,17 @@ export function SpecificCryptoForm() {
 		.slice(0, MAX_RESULTS);
 
 	return (
-		<>
+		<div>
 			{isCoinsListLoading && <p>Loading...</p>}
 			{isCoinsListError && <p>Error fetching crypto listings.</p>}
+			{specificCrypto && (
+				<div>
+					<p>{specificCrypto.description.en}</p>
+					{/* <p>{specificCrypto.description}</p> */}
+					<img src={specificCrypto.image.large} alt='' />
+				</div>
+			)}
+
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
@@ -189,6 +202,10 @@ export function SpecificCryptoForm() {
 																		'cryptoName',
 																		crypto.name
 																	);
+																	form.setValue(
+																		'cryptoId',
+																		crypto.id
+																	);
 																}}>
 																<div className='flex items-center gap-2'>
 																	<span className=''>
@@ -233,6 +250,6 @@ export function SpecificCryptoForm() {
 					<p>{selectedCrypto.symbol}</p>
 				</div>
 			)}
-		</>
+		</div>
 	);
 }
