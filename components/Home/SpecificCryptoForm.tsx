@@ -32,56 +32,71 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { toast } from '@/components/ui/use-toast';
-import { CMCListingResponse, CMCListing } from '@/types/CMCListingLatest';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { CommandList } from 'cmdk';
-import { CMCData, CMCResponse } from '@/types/CMCCryptos';
-import prisma from '@/lib/prisma';
-import { Cryptocurrency } from '@prisma/client';
-import { getAllCryptos } from '@/app/actions/getAllCryptos';
-import { getCoinsList } from '@/app/actions/getCoinsList';
-import { GeckoCoinsList } from '@/types/geckoCoinsList';
 import { CryptoDataGecko } from '@prisma/client';
 
+const API_KEY = process.env.CMC_API_KEY;
+
+async function getAllCryptos(): Promise<CryptoDataGecko[] | undefined> {
+	try {
+		const response = await fetch(
+			'https://api.coingecko.com/api/v3/coins/list',
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-cg-demo-api-key': API_KEY as string,
+				},
+				cache: 'no-store',
+			}
+		);
+
+		if (!response.ok) {
+			throw new Error(
+				'Failed to fetch data from coingecko in the back end route API'
+			);
+		}
+
+		const data: CryptoDataGecko[] = await response.json();
+		return data;
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		return undefined;
+	}
+}
+
 const FormSchema = z.object({
-	cryptoSymbol: z.string().min(3, {
+	cryptoName: z.string().min(3, {
 		message: 'CryptoSymol must be at least 3 characters.',
 	}),
 });
 
 export function SpecificCryptoForm() {
-	const [selectedCrypto, setSelectedCrypto] = useState<Cryptocurrency | null>(
+	const [selectedCrypto, setSelectedCrypto] = useState<CryptoDataGecko | null>(
 		null
 	);
 
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
-			cryptoSymbol: '',
+			cryptoName: '',
 		},
 	});
 
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const {
-		data: cryptoListings,
-		isLoading: isListingsLoading,
-		isError: isListingsError,
-	} = useQuery<Cryptocurrency[]>({
-		queryKey: ['cryptoListings'],
-		queryFn: async () => getAllCryptos(),
-		staleTime: Infinity,
-		enabled: searchTerm.length > 1,
-	});
-
-	const {
 		data: coinsList,
 		isLoading: isCoinsListLoading,
 		isError: isCoinsListError,
-	} = useQuery<GeckoCoinsList[]>({
+	} = useQuery<CryptoDataGecko[]>({
 		queryKey: ['coinsList'],
-		queryFn: async () => getCoinsList(),
+		queryFn: async () => {
+			const data = await getAllCryptos();
+			return data || [];
+		},
 		staleTime: Infinity,
 	});
 
@@ -89,7 +104,7 @@ export function SpecificCryptoForm() {
 		console.log(data);
 		try {
 			const selectedCrypto = coinsList?.find(
-				(crypto) => crypto.name === data.cryptoSymbol
+				(crypto) => crypto.name === data.cryptoName
 			);
 			if (!selectedCrypto) {
 				throw new Error('Selected crypto not found');
@@ -107,37 +122,25 @@ export function SpecificCryptoForm() {
 		}
 	}
 
-	const MAX_RESULTS = 20;
+	const MAX_RESULTS = 25;
 
 	const filteredCryptoListings = coinsList
 		?.filter((crypto) =>
 			crypto.name.toLowerCase().includes(searchTerm.toLowerCase())
 		)
-		// .sort((a, b) => {
-		// 	if (a.cmcRank && b.cmcRank) {
-		// 		return a.cmcRank - b.cmcRank;
-		// 	}
-		// 	if (a.cmcRank) {
-		// 		return -1;
-		// 	}
-		// 	if (b.cmcRank) {
-		// 		return 1;
-		// 	}
-		// 	return 0;
-		// })
 		.slice(0, MAX_RESULTS);
 
 	return (
 		<>
-			{isListingsLoading && <p>Loading...</p>}
-			{isListingsError && <p>Error fetching crypto listings.</p>}
+			{isCoinsListLoading && <p>Loading...</p>}
+			{isCoinsListError && <p>Error fetching crypto listings.</p>}
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
 					className='w-2/3 space-y-6'>
 					<FormField
 						control={form.control}
-						name='cryptoSymbol'
+						name='cryptoName'
 						render={({ field }) => (
 							<FormItem className='flex flex-col'>
 								<FormLabel>
@@ -183,7 +186,7 @@ export function SpecificCryptoForm() {
 																key={crypto.id}
 																onSelect={() => {
 																	form.setValue(
-																		'cryptoSymbol',
+																		'cryptoName',
 																		crypto.name
 																	);
 																}}>
@@ -192,7 +195,9 @@ export function SpecificCryptoForm() {
 																		{crypto.name}
 																	</span>
 																	<span className='text-xs font-bold text-black/70'>
-																		({crypto.symbol})
+																		(
+																		{crypto.symbol.toLocaleUpperCase()}
+																		)
 																	</span>
 																</div>
 																<CheckIcon

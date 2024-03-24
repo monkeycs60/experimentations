@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { CMCListing, CMCListingResponse } from '@/types/CMCListingLatest';
-import { CMCResponse } from '@/types/CMCCryptos';
 import prisma from '@/lib/prisma';
 import { GeckoCoinsList } from '@/types/geckoCoinsList';
 

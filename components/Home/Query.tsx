@@ -1,17 +1,8 @@
 'use client';
 
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { CMCResponse, CMCData } from '@/types/CMCCryptos';
-import { CMCSpecificCryptoResponse } from '@/types/CMCSpecficCrypto';
 import { useState } from 'react';
 
-const fetchCMC = async (): Promise<CMCResponse> => {
-	const response = await fetch('/api/cmc');
-	if (!response.ok) {
-		throw new Error('Failed to fetch crypto assets');
-	}
-	return response.json();
-};
+
 
 const fetchClaudeOpinion = async (cryptoName: string, cryptoPrice: number) => {
 	const response = await fetch('/api/claude', {
@@ -31,15 +22,7 @@ const fetchClaudeOpinion = async (cryptoName: string, cryptoPrice: number) => {
 };
 
 const Query = () => {
-	const {
-		data: cmcData,
-		isLoading,
-		isError,
-		error,
-	} = useQuery<CMCResponse>({
-		queryKey: ['cmc'],
-		queryFn: fetchCMC,
-	});
+	
 
 	const [claudeOpinion, setClaudeOpinion] = useState('');
 	const [isClaudeLoading, setIsClaudeLoading] = useState(false);
@@ -60,31 +43,11 @@ const Query = () => {
 		setIsClaudeLoading(false);
 	};
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (isError) {
-		return <div>Error: {error.message}</div>;
-	}
-
+	
 	return (
 		<div>
 			<h1>Crypto Exchanges</h1>
-			{cmcData?.data.slice(0, 10).map((asset) => (
-				<div key={asset.id} className='bg-slate-400'>
-					<p>{asset.name}</p>
-					<p>{asset.quote.USD.price.toFixed(2)}</p>
-					<button
-						className='bg-red-200 p-2'
-						onClick={() =>
-							handleClaudeOpinionClick(asset.name, asset.quote.USD.price)
-						}
-						disabled={isClaudeLoading}>
-						{isClaudeLoading ? 'Loading...' : 'Ask Claude'}
-					</button>
-				</div>
-			))}
+			
 			{claudeOpinion && (
 				<p className='bg-green-200 p-4'>Claude Opinion: {claudeOpinion}</p>
 			)}
