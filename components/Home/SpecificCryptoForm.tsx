@@ -40,10 +40,10 @@ import { getAllCryptos } from '@/actions/getAllCryptos';
 import { getSpecificCrypto } from '@/actions/getSpecificCrypto';
 import { GeckoCoinsList } from '@/types/geckoCoinsList';
 import { addCryptoToPortfolio } from '@/actions/addCryptoToPortfolio';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 
 const API_KEY = process.env.COINGECKO_API_KEY;
-
 
 const FormSchema = z.object({
 	cryptoId: z.string(),
@@ -53,6 +53,9 @@ const FormSchema = z.object({
 });
 
 export function SpecificCryptoForm() {
+	const { data: session } = useSession();
+	console.log(session?.user?.id);
+
 	const [open, setOpen] = useState(false);
 
 	const [selectedCrypto, setSelectedCrypto] = useState<GeckoCoinsList | null>(
@@ -116,7 +119,8 @@ export function SpecificCryptoForm() {
 			const fetchedCrypto = await getSpecificCrypto(selectedCrypto.id);
 			console.log(fetchedCrypto);
 
-			fetchedCrypto && (await addCryptoToPortfolio(fetchedCrypto));
+			fetchedCrypto &&
+				(await addCryptoToPortfolio(session?.user?.id, fetchedCrypto));
 			toast({
 				title: 'Fetched selected crypto data',
 			});

@@ -43,8 +43,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  portfolio     UserPortfolio?  @relation(fields: [portfolioId], references: [id])
-  portfolioId   String?         @unique
+ portfolio       Portfolio?
 }
 
 model VerificationToken {
@@ -68,13 +67,12 @@ model GeckoCoinID {
   developer_data                     Json?
   last_updated                       DateTime?
   tickers                            Json?
-  portfolioId       String
-  portfolio         UserPortfolio   @relation(fields: [portfolioId], references: [id])
+  portfolios      Portfolio[] @relation("PortfolioGeckoCoins")
 }
 
-model UserPortfolio {
-  id           String         @id @default(cuid())
-  user         User           @relation(fields: [userId], references: [id])
-  userId       String         @unique
-  geckoCoinIDs GeckoCoinID[]
+model Portfolio {
+  id         String       @id @default(cuid())
+  userId     String       @unique
+  user       User         @relation(fields: [userId], references: [id])
+  geckoCoins GeckoCoinID[] @relation("PortfolioGeckoCoins") 
 }
