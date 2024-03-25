@@ -1,12 +1,16 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import getServerSession from 'next-auth';
+import { auth } from '@/lib/auth';
+import { GeckoCoinID } from '@/types/geckoCoinID';
 
+export async function addCryptoToPortfolio(
+	userId: string,
+	selectedCrypto: GeckoCoinID
+) {
+	const session = await auth();
+	console.log(session);
 
-// Supposons que `userId` est l'identifiant de l'utilisateur qui veut ajouter une crypto à son portfolio
-// et `selectedCrypto` contient les informations de la crypto à ajouter.
-export async function addCryptoToPortfolio(userId, selectedCrypto) {
 	// Vérifier si le GeckoCoinID existe déjà, sinon le créer
 	let crypto = await prisma.geckoCoinID.findUnique({
 		where: {
@@ -35,7 +39,7 @@ export async function addCryptoToPortfolio(userId, selectedCrypto) {
 	// Assurez-vous que l'utilisateur a un portfolio
 	let portfolio = await prisma.portfolio.findUnique({
 		where: {
-			userId: userId,
+			userId: session?.user?.id,
 		},
 	});
 
