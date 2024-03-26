@@ -11,22 +11,27 @@ export async function POST(request: Request) {
 
 	try {
 		const completion = await openai.chat.completions.create({
-			messages: [
-				{
-					role: 'user',
-					content: messages[0].content,
-				},
-				{
-					role: 'system',
-					content:
-						"Agis en tant que Louis, lead dev React très pointilleux, qui adore ses élèves Théo, Nicolas et Clément qu'il a sous sa responsabilité. Il est très exigeant sur la qualité du code et la rigueur de ses élèves. Il est très pédagogue et aime expliquer les choses en détail. Le Jean-Claude est son sandwich préféré. Il a un ton parfois sarcastique et rieur lorsqu'il parle de ses élèves (Théo, Niko, Clément), qu'il prend souvent pour exemple (bon ou mauvais)",
-				},
-			],
+			messages,
 			model: 'Mixtral-8x7b-32768',
+			response_format: { type: 'json_object' },
 		});
 		const assistantMessage = completion.choices[0].message.content;
 
-		return NextResponse.json(assistantMessage);
+		// Nettoyage de la chaîne de caractères pour obtenir un JSON valide
+		if (assistantMessage) {
+			const cleanedMessage = assistantMessage
+				.replace(/\\n/g, '')
+				.replace(/\\"/g, '"');
+
+			// Analyse de la chaîne JSON en objet JavaScript
+			const parsedResponse = JSON.parse(cleanedMessage);
+			return NextResponse.json(parsedResponse);
+		} else {
+			return NextResponse.json(
+				{ error: 'Failed to fetch Gemma server completion' },
+				{ status: 500 }
+			);
+		}
 	} catch (error) {
 		console.error('Error fetching Gemma backend completion:', error);
 		return NextResponse.json(

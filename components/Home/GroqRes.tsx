@@ -62,7 +62,7 @@ const GroqRes = () => {
 			</form>
 			{groqRes && (
 				<p className='bg-green-200 p-4'>
-					Groq Response: {groqRes.description}
+					Groq Response: {groqRes}
 				</p>
 			)}
 		</div>
