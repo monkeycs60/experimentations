@@ -1,3 +1,4 @@
+import GeminiRes from '@/components/Home/GeminiRes';
 import GroqRes from '@/components/Home/GroqRes';
 import MyCryptoGrid from '@/components/Home/MyCryptoGrid';
 import { SpecificCryptoForm } from '@/components/Home/SpecificCryptoForm';
@@ -8,6 +9,7 @@ export default function Home() {
 		<main className='space-y-10'>
 			<Welcome />
 			<GroqRes />
+			<GeminiRes />
 			<MyCryptoGrid />
 			<SpecificCryptoForm />
 		</main>
