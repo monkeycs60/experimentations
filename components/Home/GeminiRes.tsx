@@ -1,38 +1,70 @@
 'use client';
 
-import { useCompletion } from 'ai/react';
+import { useState } from 'react';
 
-export default function Completion() {
-	const {
-		completion,
-		input,
-		stop,
-		isLoading,
-		handleInputChange,
-		handleSubmit,
-	} = useCompletion({
-		api: '/api/gemini',
+const GeminiCallAPI = async (messages: any) => {
+	const response = await fetch('/api/gpt', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ messages }),
 	});
 
+	if (!response.ok) {
+		throw new Error('Failed to fetch gpt completion');
+	}
+
+	const data = await response.json();
+	return data;
+};
+
+const GeminiRes = () => {
+	const [groqMsg, setGroqMsg] = useState('');
+	const [groqRes, setGroqRes] = useState('');
+	console.log(groqRes);
+
+	const [isGroqLoading, setIsGroqLoading] = useState(false);
+
+	const handleGroqClick = async (messages: string) => {
+		setIsGroqLoading(true);
+		const dataForGroq = [{ role: 'user', content: groqMsg }];
+
+		try {
+			const res = await GeminiCallAPI(dataForGroq);
+			console.log(res);
+
+			setGroqRes(res);
+		} catch (error) {
+			console.error('Error fetching Gemma from client completion:', error);
+		}
+		setIsGroqLoading(false);
+	};
+
 	return (
-		<div className='stretch mx-auto flex w-full max-w-md flex-col py-24'>
-			<form onSubmit={handleSubmit}>
-				<label>
-					Say something...
-					<input
-						className=' mb-8 w-full max-w-md rounded border border-gray-300 p-2 shadow-xl'
-						value={input}
-						onChange={handleInputChange}
-					/>
-				</label>
-				<output>Completion result: {completion}</output>
-				<button type='button' onClick={stop}>
-					Stop
-				</button>
-				<button disabled={isLoading} type='submit'>
-					Send
+		<div>
+			<h1>GPT</h1>
+			<form>
+				<input
+					name='groqmsg'
+					id='groqmsg'
+					onChange={(e) => setGroqMsg(e.target.value)}
+					type='text'
+				/>
+				<button
+					onClick={(e) => {
+						e.preventDefault();
+						handleGroqClick(groqMsg);
+					}}
+					className='rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700'>
+					Ask GPT
 				</button>
 			</form>
+			{groqRes && (
+				<p className='bg-green-200 p-4'>GPT Response: {groqRes}</p>
+			)}
 		</div>
 	);
-}
+};
+
+export default GeminiRes;

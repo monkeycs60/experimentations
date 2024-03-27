@@ -1,25 +1,38 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { GoogleGenerativeAIStream, StreamingTextResponse } from 'ai';
+import { NextResponse } from 'next/server';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
-
-// IMPORTANT! Set the runtime to edge
-export const runtime = 'edge';
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const MODEL_NAME = 'gemini-1.0-pro-001';
+const API_KEY = process.env.GOOGLE_API_KEY || '';
 
 export async function POST(req: Request) {
-	// Extract the `prompt` from the body of the request
-	const { prompt } = await req.json();
+	const { messages } = await req.json();
 
-	// Ask Google Generative AI for a streaming completion given the prompt
-	const response = await genAI
-		.getGenerativeModel({ model: 'gemini-pro' })
-		.generateContentStream({
-			contents: [{ role: 'user', parts: [{ text: prompt }] }],
+	try {
+		const genAI = new GoogleGenerativeAI(API_KEY);
+		const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+		const generationConfig = {
+			temperature: 0.2,
+			topK: 1,
+			topP: 1,
+			maxOutputTokens: 2048,
+			
+		};
+
+		const chat = model.startChat({
+			generationConfig,
+			history: [],
 		});
 
-	// Convert the response into a friendly text-stream
-	const stream = GoogleGenerativeAIStream(response);
+		const result = await chat.sendMessage(messages[0].content);
+		const response = result.response;
+		console.log(response.text());
 
-	// Respond with the stream
-	return new StreamingTextResponse(stream);
+		return NextResponse.json({ completion: response.text() });
+	} catch (error) {
+		console.error('Error fetching ggggemini completion:', error);
+		return new Response('Error fetching gemini completion', {
+			status: 500,
+		});
+	}
 }
