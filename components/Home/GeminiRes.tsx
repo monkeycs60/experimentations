@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { TokenPricePrediction } from '@/app/api/gpt/route';
 
 const GeminiCallAPI = async (messages: any) => {
 	const response = await fetch('/api/gpt', {
@@ -33,7 +34,6 @@ const GeminiRes = () => {
 		try {
 			const res = await GeminiCallAPI(dataForGroq);
 			console.log(res);
-
 			setGroqRes(res);
 		} catch (error) {
 			console.error('Error fetching Gemma from client completion:', error);
@@ -61,7 +61,12 @@ const GeminiRes = () => {
 				</button>
 			</form>
 			{groqRes && (
-				<p className='bg-green-200 p-4'>GPT Response: {groqRes}</p>
+				<>
+					{/* <p className='bg-green-200 p-4'>GPT Response: {groqRes}</p> */}
+					{/* <p>{groqRes.price_1st_july_2024}</p>
+					<p>{groqRes.token_name}</p> */}
+					<p>{groqRes}</p>
+				</>
 			)}
 		</div>
 	);
