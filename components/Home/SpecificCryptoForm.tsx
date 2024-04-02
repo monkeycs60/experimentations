@@ -42,6 +42,7 @@ import { GeckoCoinsList } from '@/types/geckoCoinsList';
 import { addCryptoToPortfolio } from '@/actions/addCryptoToPortfolio';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import { revalidatePath } from 'next/cache';
 
 const API_KEY = process.env.COINGECKO_API_KEY;
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { getPortfolioData } from '@/actions/getPortfolioData';
+import { MarketData } from '@/types/geckoCoinID';
 
 const fetchUserPortfolio = async () => {
 	const portfolio = await getPortfolioData();
@@ -13,13 +14,21 @@ const PortfolioContent = async () => {
 		<div>
 			<h2>Your current porfolio contains:</h2>
 			<ul className='flex flex-wrap items-center justify-center gap-12'>
-				{portfolio?.map((item) => (
-					<li
-						key={item.id}
-						className='h-24 w-32 bg-slate-400 p-6 text-center text-white'>
-						{item.symbol} - {item.id}
-					</li>
-				))}
+				{portfolio?.map((item) => {
+					console.log(item.market_data);
+					const marketDataCrypto =
+						item.market_data as unknown as MarketData;
+					console.log(marketDataCrypto);
+
+					return (
+						<li
+							key={item.id}
+							className='h-24 w-32 bg-slate-400 p-6 text-center text-white'>
+							{item.symbol} - {item.id}
+							{marketDataCrypto.current_price.usd}
+						</li>
+					);
+				})}
 			</ul>
 			<p>
 				Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius quod

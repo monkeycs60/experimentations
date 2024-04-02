@@ -185,3 +185,15 @@ interface Ticker {
 	coin_id: string;
 	target_coin_id: string;
 }
+
+export interface MarketData {
+	current_price: { [key: string]: number };
+	total_value_locked: number | null;
+	mcap_to_tvl_ratio: number | null;
+	fdv_to_tvl_ratio: number | null;
+	roi: null;
+	ath: { [key: string]: number };
+	ath_change_percentage: { [key: string]: number };
+	ath_date: { [key: string]: string };
+	atl: { [key: string]: number };
+}
