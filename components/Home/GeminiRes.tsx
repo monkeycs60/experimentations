@@ -3,8 +3,15 @@
 import { useState } from 'react';
 import { TokenPricePrediction } from '@/app/api/gpt/route';
 
+interface OpinionData {
+	opinion: {
+		type: string;
+		text: string;
+	}[];
+}
+
 const GeminiCallAPI = async (messages: any) => {
-	const response = await fetch('/api/gpt', {
+	const response = await fetch('/api/claude', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -17,12 +24,13 @@ const GeminiCallAPI = async (messages: any) => {
 	}
 
 	const data = await response.json();
-	return data;
+	return data as OpinionData;
 };
 
 const GeminiRes = () => {
 	const [groqMsg, setGroqMsg] = useState('');
 	const [groqRes, setGroqRes] = useState('');
+	console.log(groqRes);
 	console.log(groqRes);
 
 	const [isGroqLoading, setIsGroqLoading] = useState(false);
@@ -34,7 +42,7 @@ const GeminiRes = () => {
 		try {
 			const res = await GeminiCallAPI(dataForGroq);
 			console.log(res);
-			setGroqRes(res);
+			setGroqRes(res.opinion[0].text);
 		} catch (error) {
 			console.error('Error fetching Gemma from client completion:', error);
 		}
@@ -60,14 +68,14 @@ const GeminiRes = () => {
 					Ask GPT
 				</button>
 			</form>
-			{groqRes && (
-				<>
-					{/* <p className='bg-green-200 p-4'>GPT Response: {groqRes}</p> */}
-					{/* <p>{groqRes.price_1st_july_2024}</p>
+			{/* {groqRes && ( */}
+			<>
+				{/* <p className='bg-green-200 p-4'>GPT Response: {groqRes}</p> */}
+				{/* <p>{groqRes.price_1st_july_2024}</p>
 					<p>{groqRes.token_name}</p> */}
-					<p>{groqRes}</p>
-				</>
-			)}
+				{/* <p>{groqRes}</p> */}
+			</>
+			{/* )} */}
 		</div>
 	);
 };
