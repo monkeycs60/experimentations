@@ -1,48 +1,47 @@
 import { getPortfolioData } from '@/actions/getPortfolioData';
 import { MarketData } from '@/types/geckoCoinID';
+import { GeckoCoinsMarket } from '@/types/geckoCoinsMarket';
 import { Card, SparkAreaChart } from '@tremor/react';
 
 const PortfolioContent = async () => {
 	const portfolio = await getPortfolioData();
 	console.log(portfolio);
 
+	const fetchPortfolioCurrentData = async () => {
+		if (!portfolio) return;
+		// Extraire les IDs des coins du portfolio
+		const coinIds = portfolio.map((item) => item.id);
+
+		// Formater les IDs pour l'URL de l'API
+		const formattedIds = coinIds
+			.map((id) => encodeURIComponent(id))
+			.join('%2C');
+
+		// Construire l'URL de l'API avec les IDs des coins
+		const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${formattedIds}&order=market_cap_desc&per_page=100&page=1&sparkline=false`;
+
+		const options = {
+			method: 'GET',
+			headers: { 'x-cg-demo-api-key': 'CG-UiA8wLTHpsZkFrZtVcSu7Fpo' },
+			next: { revalidate: 20 },
+		};
+
+		// Faire l'appel à l'API
+		const response = await fetch(url, options);
+		const data = await response.json();
+		console.log(data);
+
+		return data as GeckoCoinsMarket[];
+	};
+
+	const portfolioCurrentData = await fetchPortfolioCurrentData();
+	console.log(portfolioCurrentData);
+
 	return (
 		<div>
 			<h2>Your current porfolio contains:</h2>
 			<ul className='flex flex-wrap items-center justify-center gap-12'>
-				{portfolio?.map((item) => {
-					const marketDataCrypto =
-						item.market_data as unknown as MarketData;
-					const chartdata = [
-						{
-							month: 'Jan 21',
-							Performance: 4000,
-						},
-						{
-							month: 'Feb 21',
-							Performance: 3000,
-						},
-						{
-							month: 'Mar 21',
-							Performance: 2000,
-						},
-						{
-							month: 'Apr 21',
-							Performance: 2780,
-						},
-						{
-							month: 'May 21',
-							Performance: 1890,
-						},
-						{
-							month: 'Jun 21',
-							Performance: 2390,
-						},
-						{
-							month: 'Jul 21',
-							Performance: 3490,
-						},
-					];
+				{portfolioCurrentData?.map((item) => {
 					return (
 						<Card
 							key={item.id}
@@ -56,22 +55,23 @@ const PortfolioContent = async () => {
 								</span>
 							</div>
 							<SparkAreaChart
-								data={chartdata}
-								categories={['Performance']}
-								index={'month'}
+								data={[
+									{ name: 'Prix actuel', value: item.current_price },
+									{ name: 'ATH', value: item.ath },
+									{ name: 'ATL', value: item.atl },
+								]}
+								categories={['value']}
+								index={'name'}
 								colors={['emerald']}
 								className='h-8 w-20 sm:h-10 sm:w-36'
 							/>
 							<div className='flex items-center space-x-2.5'>
 								<span className='text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium'>
-									${marketDataCrypto.current_price.usd}
+									${item.current_price}
 								</span>
 								<span className='text-tremor-default rounded bg-emerald-500 px-2 py-1 font-medium text-white'>
-									{marketDataCrypto
-										.price_change_percentage_24h_in_currency.usd
-										? marketDataCrypto.price_change_percentage_24h_in_currency.usd.toFixed(
-												1
-										  )
+									{item.price_change_percentage_24h
+										? item.price_change_percentage_24h.toFixed(1)
 										: 0}
 									%
 								</span>
