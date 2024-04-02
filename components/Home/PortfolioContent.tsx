@@ -1,24 +1,15 @@
-import React from 'react';
 import { getPortfolioData } from '@/actions/getPortfolioData';
 import { MarketData } from '@/types/geckoCoinID';
 
-const fetchUserPortfolio = async () => {
-	const portfolio = await getPortfolioData();
-	return portfolio;
-};
-
 const PortfolioContent = async () => {
-	const portfolio = await fetchUserPortfolio();
-	console.log(portfolio);
+	const portfolio = await getPortfolioData();
 	return (
 		<div>
 			<h2>Your current porfolio contains:</h2>
 			<ul className='flex flex-wrap items-center justify-center gap-12'>
 				{portfolio?.map((item) => {
-					console.log(item.market_data);
 					const marketDataCrypto =
 						item.market_data as unknown as MarketData;
-					console.log(marketDataCrypto);
 
 					return (
 						<li

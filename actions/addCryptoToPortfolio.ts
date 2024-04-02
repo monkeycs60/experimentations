@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { GeckoCoinID } from '@/types/geckoCoinID';
+import { revalidatePath } from 'next/cache';
 
 export async function addCryptoToPortfolio(
 	userId: string,
@@ -67,6 +68,8 @@ export async function addCryptoToPortfolio(
 			},
 		});
 	}
+
+	revalidatePath('/');
 
 	return { message: 'Crypto added to portfolio successfully.' };
 }

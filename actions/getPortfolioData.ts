@@ -3,10 +3,13 @@
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { GeckoCoinID } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 export async function getPortfolioData() {
 	const session = await auth();
-	if (!session) {
+	console.log(session);
+
+	if (!session || !session.user) {
 		return null;
 	}
 	const portfolio = await prisma.portfolio.findMany({
