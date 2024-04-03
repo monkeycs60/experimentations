@@ -1,7 +1,7 @@
 import { getPortfolioData } from '@/actions/getPortfolioData';
-import { MarketData } from '@/types/geckoCoinID';
 import { GeckoCoinsMarket } from '@/types/geckoCoinsMarket';
-import { Card, SparkAreaChart } from '@tremor/react';
+import { ArrowDown, ArrowUp } from 'lucide-react';
+import Image from 'next/image';
 
 const PortfolioContent = async () => {
 	const portfolio = await getPortfolioData();
@@ -11,26 +11,20 @@ const PortfolioContent = async () => {
 		if (!portfolio) return;
 		// Extraire les IDs des coins du portfolio
 		const coinIds = portfolio.map((item) => item.id);
-
 		// Formater les IDs pour l'URL de l'API
 		const formattedIds = coinIds
 			.map((id) => encodeURIComponent(id))
 			.join('%2C');
-
 		// Construire l'URL de l'API avec les IDs des coins
 		const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${formattedIds}&order=market_cap_desc&per_page=100&page=1&sparkline=false`;
-
 		const options = {
 			method: 'GET',
 			headers: { 'x-cg-demo-api-key': 'CG-UiA8wLTHpsZkFrZtVcSu7Fpo' },
 			next: { revalidate: 20 },
 		};
-
 		// Faire l'appel à l'API
 		const response = await fetch(url, options);
 		const data = await response.json();
-		console.log(data);
-
 		return data as GeckoCoinsMarket[];
 	};
 
@@ -38,52 +32,53 @@ const PortfolioContent = async () => {
 	console.log(portfolioCurrentData);
 
 	return (
-		<div>
+		<div className='my-10 space-y-4'>
 			<h2>Your current porfolio contains:</h2>
 			<ul className='flex flex-wrap items-center justify-center gap-12'>
 				{portfolioCurrentData?.map((item) => {
+					const priceChangePercentage = item.price_change_percentage_24h;
 					return (
-						<Card
+						<div
 							key={item.id}
-							className='mx-auto flex max-w-lg items-center justify-between px-4 py-3.5'>
-							<div className='flex items-center space-x-2.5'>
-								<p className='text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium'>
-									{item.symbol}
-								</p>
-								<span className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
-									{item.name}
-								</span>
+							className='flex h-32 w-[400px] items-center justify-between rounded-xl bg-white px-6 py-4'>
+							<div className='space-y-2'>
+								<Image
+									src={item.image}
+									alt={item.name}
+									width={36}
+									height={36}
+									className='rounded-xl'
+								/>
+								<div className='flex items-center gap-2'>
+									<p className='font-bold'>
+										{item.symbol.toLocaleUpperCase()}
+									</p>
+									<span className=''>{item.name}</span>
+								</div>
 							</div>
-							<SparkAreaChart
-								data={[
-									{ name: 'Prix actuel', value: item.current_price },
-									{ name: 'ATH', value: item.ath },
-									{ name: 'ATL', value: item.atl },
-								]}
-								categories={['value']}
-								index={'name'}
-								colors={['emerald']}
-								className='h-8 w-20 sm:h-10 sm:w-36'
-							/>
-							<div className='flex items-center space-x-2.5'>
-								<span className='text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium'>
-									${item.current_price}
-								</span>
-								<span className='text-tremor-default rounded bg-emerald-500 px-2 py-1 font-medium text-white'>
-									{item.price_change_percentage_24h
-										? item.price_change_percentage_24h.toFixed(1)
+							<span className='text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium'>
+								${item.current_price}
+							</span>
+							<div className='flex items-center gap-3'>
+								{priceChangePercentage < 0 ? (
+									<ArrowDown size={20} color='red' />
+								) : (
+									<ArrowUp size={20} color='green' />
+								)}
+
+								<span
+									className={`text-tremor-default rounded px-2 py-1 font-medium text-white ${
+										priceChangePercentage < 0
+											? 'bg-red-500'
+											: 'bg-emerald-500'
+									}`}>
+									{priceChangePercentage
+										? priceChangePercentage.toFixed(1)
 										: 0}
 									%
 								</span>
 							</div>
-						</Card>
-
-						// <li
-						// 	key={item.id}
-						// 	className='h-32 w-64 bg-slate-400 p-6 text-center text-white'>
-						// 	{item.symbol} - {item.id}
-						// 	{marketDataCrypto.current_price.usd}
-						// </li>
+						</div>
 					);
 				})}
 			</ul>
