@@ -67,6 +67,8 @@ export default TotalChart<AreaProps, TooltipData>(
 	}: AreaProps & WithTooltipProvidedProps<TooltipData>) => {
 		if (width < 10) return null;
 
+		console.log(bitcoinPrices);
+
 		// bounds
 		const innerWidth = width - margin.left - margin.right;
 		const innerHeight = height - margin.top - margin.bottom;

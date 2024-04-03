@@ -6,6 +6,7 @@ import { SpecificCryptoForm } from '@/components/Home/SpecificCryptoForm';
 import TotalChart from '@/components/Home/TotalChart';
 import Welcome from '@/components/Home/Welcome';
 import { getBitcoinHistoricalPrices } from '@/actions/getBitcoinHistoricalPrices';
+import FutureChart from '@/components/Home/FutureChart';
 
 const Home = async () => {
 	const bitcoinPrices = await getBitcoinHistoricalPrices();
@@ -15,7 +16,8 @@ const Home = async () => {
 			<Welcome />
 			<SpecificCryptoForm />
 			<PortfolioContent />
-			<TotalChart width={1000} height={800} bitcoinPrices={bitcoinPrices} />
+			<TotalChart width={1000} height={600} bitcoinPrices={bitcoinPrices} />
+			<FutureChart bitcoinPrices={bitcoinPrices} />
 			<GroqRes />
 		</main>
 	);

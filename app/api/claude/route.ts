@@ -7,7 +7,7 @@ const anthropic = new Anthropic({
 });
 
 export async function POST(request: Request) {
-	const { cryptoName, cryptoPrice } = await request.json();
+	const { bitcoinPrices } = await request.json();
 
 	try {
 		const message = await anthropic.messages.create({
@@ -19,7 +19,11 @@ export async function POST(request: Request) {
 					content: [
 						{
 							type: 'text',
-							text: `What do you think about ${cryptoName}, the current price is ${cryptoPrice} USD ? Write a poem about it`,
+							text: `Voici un tableau d'objets contenant les dates et les prix du bitcoin pour l'année précédente :\n\n${JSON.stringify(
+								bitcoinPrices,
+								null,
+								2
+							)}\n\nPouvez-vous continuer ce tableau en ajoutant des prédictions de prix pour les 2 prochains mois ? Veuillez fournir les résultats au format JSON.`,
 						},
 					],
 				},
