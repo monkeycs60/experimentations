@@ -8,6 +8,9 @@ const anthropic = new Anthropic({
 
 export async function POST(request: Request) {
 	const { bitcoinPrices } = await request.json();
+	const filteredBitcoinPrices = bitcoinPrices.filter(
+		(_: any, index: number) => index % 3 === 0
+	);
 
 	try {
 		const message = await anthropic.messages.create({
@@ -19,11 +22,16 @@ export async function POST(request: Request) {
 					content: [
 						{
 							type: 'text',
-							text: `Voici un tableau d'objets contenant les dates et les prix du bitcoin pour l'année précédente :\n\n${JSON.stringify(
-								bitcoinPrices,
-								null,
-								2
-							)}\n\nPouvez-vous continuer ce tableau en ajoutant des prédictions de prix pour les 2 prochains mois ? Veuillez fournir les résultats au format JSON.`,
+							text: `
+						Here is a table of objects containing the dates and prices of Bitcoin for the previous year: 
+						${JSON.stringify(filteredBitcoinPrices, null, 2)}
+						Can you continue this table by adding price predictions for the next 30 days with an interval of 1 day (every day, and note every 3 days like in the dataset I provide you)? Please provide the results in JSON format. Do not add comment, just produce an output beginning by { and ending with }. Do not make linear prediction: help you with past data to reproduce the value swing over time. The price today is ${
+							filteredBitcoinPrices[filteredBitcoinPrices.length - 1]
+								.price
+						} USD. The last date is ${
+								filteredBitcoinPrices[filteredBitcoinPrices.length - 1]
+									.date
+							}`,
 						},
 					],
 				},

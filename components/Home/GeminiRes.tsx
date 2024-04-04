@@ -30,8 +30,6 @@ const GeminiCallAPI = async (messages: any) => {
 const GeminiRes = () => {
 	const [groqMsg, setGroqMsg] = useState('');
 	const [groqRes, setGroqRes] = useState('');
-	console.log(groqRes);
-	console.log(groqRes);
 
 	const [isGroqLoading, setIsGroqLoading] = useState(false);
 
@@ -41,7 +39,6 @@ const GeminiRes = () => {
 
 		try {
 			const res = await GeminiCallAPI(dataForGroq);
-			console.log(res);
 			setGroqRes(res.opinion[0].text);
 		} catch (error) {
 			console.error('Error fetching Gemma from client completion:', error);

@@ -21,8 +21,6 @@ export async function POST(request: Request) {
 
 	const newdata = data.prices[0][1];
 
-	console.log(data);
-	console.log(data.prices[0][1]);
 
 	try {
 		const completion = await openai.chat.completions.create({

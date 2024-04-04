@@ -7,7 +7,6 @@ import { revalidatePath } from 'next/cache';
 
 export async function getPortfolioData() {
 	const session = await auth();
-	console.log(session);
 
 	if (!session || !session.user) {
 		return null;

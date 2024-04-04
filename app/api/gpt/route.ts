@@ -28,7 +28,6 @@ export async function POST(request: Request) {
 	const res = await fetch(url, options);
 	const data = await res.json();
 
-	console.log(data);
 
 	try {
 		const completion = await openai.chat.completions.create({

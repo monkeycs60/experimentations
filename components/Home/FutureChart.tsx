@@ -2,7 +2,6 @@
 
 import { BitcoinPrice } from '@/actions/getBitcoinHistoricalPrices';
 import React from 'react';
-import TotalChart from './TotalChart';
 import { useState } from 'react';
 
 const claudeFuturApi = async (bitcoinPrices: BitcoinPrice[]) => {
@@ -27,8 +26,8 @@ type FutureChartProps = {
 };
 
 const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
-	const [futureChartData, setFutureChartData] = useState<BitcoinPrice[]>([]);
-	console.log(futureChartData);
+	// const [futureChartData, setFutureChartData] = useState<BitcoinPrice[]>([]);
+	// console.log(futureChartData);
 
 	return (
 		<div>
@@ -39,7 +38,7 @@ const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
 					const futureChartData = await claudeFuturApi(bitcoinPrices);
 					console.log(futureChartData);
 
-					setFutureChartData(futureChartData);
+					// setFutureChartData(futureChartData);
 				}}>
 				Get future prediction
 			</button>

@@ -26,8 +26,6 @@ export async function POST(req: Request) {
 
 		const result = await chat.sendMessage(messages[0].content);
 		const response = result.response;
-		console.log(response.text());
-
 		return NextResponse.json({ completion: response.text() });
 	} catch (error) {
 		console.error('Error fetching ggggemini completion:', error);

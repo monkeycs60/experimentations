@@ -10,7 +10,6 @@ export async function addCryptoToPortfolio(
 	selectedCrypto: GeckoCoinID
 ) {
 	const session = await auth();
-	console.log(session);
 
 	// Vérifier si le GeckoCoinID existe déjà, sinon le créer
 	let crypto = await prisma.geckoCoinID.findUnique({

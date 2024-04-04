@@ -7,31 +7,44 @@ const openai = new OpenAI({
 });
 
 export async function POST(request: Request) {
-	const { messages } = await request.json();
+	const { bitcoinPrices } = await request.json();
+	console.log('un monde où', bitcoinPrices);
 
 	try {
 		const completion = await openai.chat.completions.create({
-			messages,
+			messages: [
+				{
+					role: 'user',
+					content: `
+						Here is a table of objects containing the dates and prices of Bitcoin for the previous year: ${JSON.stringify(
+							bitcoinPrices,
+							null,
+							2
+						)}
+						Can you continue this table by adding price predictions for the next 2 months? Please provide the results in JSON format.`,
+				},
+				{
+					role: 'system',
+					content: `
+						Here is a table of objects containing the dates and prices of Bitcoin for the previous year: ${JSON.stringify(
+							bitcoinPrices,
+							null,
+							2
+						)}
+						Can you continue this table by adding price predictions for the next 2 months? Please provide the results in JSON format.`,
+				},
+			],
 			model: 'Mixtral-8x7b-32768',
-			response_format: { type: 'json_object' },
+			max_tokens: 4000,
 		});
 		const assistantMessage = completion.choices[0].message.content;
+		// if (assistantMessage) JSON.parse(assistantMessage);
 
-		// Nettoyage de la chaîne de caractères pour obtenir un JSON valide
-		if (assistantMessage) {
-			const cleanedMessage = assistantMessage
-				.replace(/\\n/g, '')
-				.replace(/\\"/g, '"');
+		console.log('assistantMessage', assistantMessage);
 
-			// Analyse de la chaîne JSON en objet JavaScript
-			const parsedResponse = JSON.parse(cleanedMessage);
-			return NextResponse.json(parsedResponse);
-		} else {
-			return NextResponse.json(
-				{ error: 'Failed to fetch Gemma server completion' },
-				{ status: 500 }
-			);
-		}
+		return NextResponse.json(
+			assistantMessage || { error: 'No assistant message' }
+		);
 	} catch (error) {
 		console.error('Error fetching Gemma backend completion:', error);
 		return NextResponse.json(

@@ -5,7 +5,6 @@ import Image from 'next/image';
 
 const PortfolioContent = async () => {
 	const portfolio = await getPortfolioData();
-	console.log(portfolio);
 
 	const fetchPortfolioCurrentData = async () => {
 		if (!portfolio) return;
@@ -29,7 +28,6 @@ const PortfolioContent = async () => {
 	};
 
 	const portfolioCurrentData = await fetchPortfolioCurrentData();
-	console.log(portfolioCurrentData);
 
 	return (
 		<div className='my-10 space-y-4'>
