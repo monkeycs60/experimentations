@@ -37,6 +37,25 @@ const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
 
 					const futureChartData = await claudeFuturApi(bitcoinPrices);
 					console.log(futureChartData);
+					const newDataParsed = JSON.stringify(futureChartData);
+					console.log(newDataParsed);
+
+					const cleanedString = newDataParsed
+						.replace(/\\\\n/g, '')
+						.replace(/\\n/g, '')
+						.replace(/\\\\"/g, "'")
+						.replace(/{/g, '')
+						.replace(/}/g, '')
+						.trim();
+
+					console.log(cleanedString);
+
+					if (cleanedString) {
+						const jsonString = `[${cleanedString}]`;
+						const data = JSON.parse(jsonString);
+						console.log(data);
+						// setFutureChartData(data);
+					}
 
 					// setFutureChartData(futureChartData);
 				}}>
