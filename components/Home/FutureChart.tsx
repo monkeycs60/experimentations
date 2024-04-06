@@ -5,7 +5,7 @@ import React from 'react';
 import { useState } from 'react';
 
 const claudeFuturApi = async (bitcoinPrices: BitcoinPrice[]) => {
-	const response = await fetch('/api/claude', {
+	const response = await fetch('/api/groq-json', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -37,25 +37,8 @@ const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
 
 					const futureChartData = await claudeFuturApi(bitcoinPrices);
 					console.log(futureChartData);
-					const newDataParsed = JSON.stringify(futureChartData);
-					console.log(newDataParsed);
-
-					const cleanedString = newDataParsed
-						.replace(/\\\\n/g, '')
-						.replace(/\\n/g, '')
-						.replace(/\\\\"/g, "'")
-						.replace(/{/g, '')
-						.replace(/}/g, '')
-						.trim();
-
-					console.log(cleanedString);
-
-					if (cleanedString) {
-						const jsonString = `[${cleanedString}]`;
-						const data = JSON.parse(jsonString);
-						console.log(data);
-						// setFutureChartData(data);
-					}
+					const futureChartDataParsed = JSON.parse(futureChartData);
+					console.log(futureChartDataParsed);
 
 					// setFutureChartData(futureChartData);
 				}}>

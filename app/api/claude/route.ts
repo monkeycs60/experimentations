@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 							text: `
 						Here is a table of objects containing the dates and prices of Bitcoin for the previous year: 
 						${JSON.stringify(filteredBitcoinPrices, null, 2)}
-						Can you continue this table by adding price predictions for the next 30 days with an interval of 1 day (every day, and note every 3 days like in the dataset I provide you)? Please provide the results in JSON format. Do not add comment, just produce an output beginning by { and ending with }. Do not make linear prediction: help you with past data to reproduce the value swing over time. The price today is ${
+						Can you continue this table by adding price predictions for the next 30 days with an interval of 1 day (every day, and note every 3 days like in the dataset I provide you)? Respect the following structure for your answer: put strings in an array, with just the price, starting from the tomorrow, ending with the 30rd day from today, with this structure : [69000, 67000, 65000, ...]. This is just a structure. Do not add comment, just produce an output beginning by { and ending with }. Do not make linear prediction: help you with past data to reproduce the value swing over time. The price today is ${
 							filteredBitcoinPrices[filteredBitcoinPrices.length - 1]
 								.price
 						} USD. The last date is ${

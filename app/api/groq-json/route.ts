@@ -9,6 +9,9 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
 	const { bitcoinPrices } = await request.json();
 	console.log('un monde où', bitcoinPrices);
+	const filteredBitcoinPrices = bitcoinPrices.filter(
+		(_: any, index: number) => index % 7 === 0
+	);
 
 	try {
 		const completion = await openai.chat.completions.create({
@@ -17,28 +20,30 @@ export async function POST(request: Request) {
 					role: 'user',
 					content: `
 						Here is a table of objects containing the dates and prices of Bitcoin for the previous year: ${JSON.stringify(
-							bitcoinPrices,
+							filteredBitcoinPrices,
 							null,
 							2
 						)}
-						Can you continue this table by adding price predictions for the next 2 months? Please provide the results in JSON format.`,
+						Can you continue this table by adding price predictions for the next 2 months? Please provide the results in an array of json objects.`,
 				},
 				{
 					role: 'system',
 					content: `
-						Here is a table of objects containing the dates and prices of Bitcoin for the previous year: ${JSON.stringify(
-							bitcoinPrices,
-							null,
-							2
-						)}
-						Can you continue this table by adding price predictions for the next 2 months? Please provide the results in JSON format.`,
+						You'll respond with a JSON array with as many objects as days, with always the same fields : date (date format) and price (number). It should predict bitcoin prices for the next 2 months. The structure is : 
+						[
+							{json object 1},
+							{json object 2},
+							etc.
+						] 
+						.`,
 				},
 			],
 			model: 'Mixtral-8x7b-32768',
+			response_format: { type: 'json_object' },
 			max_tokens: 4000,
 		});
 		const assistantMessage = completion.choices[0].message.content;
-		// if (assistantMessage) JSON.parse(assistantMessage);
+		if (assistantMessage) JSON.parse(assistantMessage);
 
 		console.log('assistantMessage', assistantMessage);
 
