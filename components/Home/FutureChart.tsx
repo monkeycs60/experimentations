@@ -3,6 +3,7 @@
 import { BitcoinPrice } from '@/actions/getBitcoinHistoricalPrices';
 import React from 'react';
 import { useState } from 'react';
+import TotalChart from './TotalChart';
 
 const claudeFuturApi = async (bitcoinPrices: BitcoinPrice[]) => {
 	const response = await fetch('/api/groq-json', {
@@ -26,8 +27,10 @@ type FutureChartProps = {
 };
 
 const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
-	// const [futureChartData, setFutureChartData] = useState<BitcoinPrice[]>([]);
-	// console.log(futureChartData);
+	const [futureChartData, setFutureChartData] = useState<
+		BitcoinPrice[] | undefined
+	>(undefined);
+	console.log(futureChartData);
 
 	return (
 		<div>
@@ -39,16 +42,23 @@ const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
 					console.log(futureChartData);
 					const futureChartDataParsed = JSON.parse(futureChartData);
 					console.log(futureChartDataParsed);
+					const allChartData = [
+						...bitcoinPrices,
+						...futureChartDataParsed,
+					];
+					setFutureChartData(allChartData);
 
 					// setFutureChartData(futureChartData);
 				}}>
 				Get future prediction
 			</button>
-			{/* <TotalChart
-				width={1000}
-				height={600}
-				bitcoinPrices={futureChartData}
-			/> */}
+			{futureChartData && (
+				<TotalChart
+					width={1000}
+					height={600}
+					bitcoinPrices={futureChartData}
+				/>
+			)}
 		</div>
 	);
 };
