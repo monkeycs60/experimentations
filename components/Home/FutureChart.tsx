@@ -4,6 +4,7 @@ import { BitcoinPrice } from '@/actions/getBitcoinHistoricalPrices';
 import React from 'react';
 import { useState } from 'react';
 import TotalChart from './TotalChart';
+import { format } from 'date-fns';
 
 const claudeFuturApi = async (bitcoinPrices: BitcoinPrice[]) => {
 	const response = await fetch('/api/groq-json', {
@@ -46,7 +47,13 @@ const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
 						...bitcoinPrices,
 						...futureChartDataParsed,
 					];
-					setFutureChartData(allChartData);
+					const formattedChartData: BitcoinPrice[] = allChartData.map(
+						({ date, price }: { date: string; price: number }) => ({
+							date: new Date(date),
+							price,
+						})
+					);
+					setFutureChartData(formattedChartData);
 
 					// setFutureChartData(futureChartData);
 				}}>

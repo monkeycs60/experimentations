@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { format } from 'date-fns';
 
 const openai = new OpenAI({
-	apiKey: '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',
-	baseURL: 'https://api.groq.com/openai/v1',
+	apiKey: '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',
+	baseURL: 'https://api.perplexity.ai',
 });
 
 export async function POST(request: Request) {
 	const { bitcoinPrices } = await request.json();
 	console.log('un monde où', bitcoinPrices);
-	const filteredBitcoinPrices = bitcoinPrices.filter(
-		(_: any, index: number) => index % 7 === 0
-	);
+	// const filteredBitcoinPrices = bitcoinPrices;
+	// JE VEUX récupérer la deuxième moitié du table
+	const filteredBitcoinPrices = bitcoinPrices
+		.slice(bitcoinPrices.length / 2);
+	console.log('filteredBitcoinPrices', filteredBitcoinPrices);
 
 	try {
 		const completion = await openai.chat.completions.create({
@@ -22,11 +25,11 @@ export async function POST(request: Request) {
 Here is a table of objects containing the dates and prices of Bitcoin for the previous year:
 ${JSON.stringify(filteredBitcoinPrices, null, 2)}
 
-Can you continue this table by adding price predictions for the next 2 months? Please provide the results in a valid JSON array of objects with the fields "date" (ISO date string) and "price" (number). Do not add any comment or reflexion, just the array of JSON.
+Can you continue this table by adding price predictions for the next 2 months? Do not add any comment please nor advice or anything. Please provide the results in a valid JSON array of objects with the fields "date" (ISO date string) and "price" (number). Do not add any comment or reflexion, just the array of JSON. Do not make any advice. I just want raw datas.
 `,
 				},
 			],
-			model: 'Mixtral-8x7b-32768',
+			model: 'mixtral-8x7b-instruct',
 			max_tokens: 4000,
 		});
 		const assistantMessage = completion.choices[0].message.content;
