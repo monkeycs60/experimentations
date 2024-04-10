@@ -8,9 +8,7 @@ const anthropic = new Anthropic({
 
 export async function POST(request: Request) {
 	const { bitcoinPrices } = await request.json();
-	const filteredBitcoinPrices = bitcoinPrices.filter(
-		(_: any, index: number) => index % 3 === 0
-	);
+	const filteredBitcoinPrices = bitcoinPrices.slice(bitcoinPrices.length / 2);
 
 	try {
 		const message = await anthropic.messages.create({
@@ -23,21 +21,19 @@ export async function POST(request: Request) {
 						{
 							type: 'text',
 							text: `
-						Here is a table of objects containing the dates and prices of Bitcoin for the previous year: 
-						${JSON.stringify(filteredBitcoinPrices, null, 2)}
-						Can you continue this table by adding price predictions for the next 30 days with an interval of 1 day (every day, and note every 3 days like in the dataset I provide you)? Respect the following structure for your answer: put strings in an array, with just the price, starting from the tomorrow, ending with the 30rd day from today, with this structure : [69000, 67000, 65000, ...]. This is just a structure. Do not add comment, just produce an output beginning by { and ending with }. Do not make linear prediction: help you with past data to reproduce the value swing over time. The price today is ${
-							filteredBitcoinPrices[filteredBitcoinPrices.length - 1]
-								.price
-						} USD. The last date is ${
-								filteredBitcoinPrices[filteredBitcoinPrices.length - 1]
-									.date
-							}`,
+Here is a table of objects containing the dates and prices of Bitcoin for the previous year:
+${JSON.stringify(filteredBitcoinPrices, null, 2)}
+
+Can you continue this table by adding price predictions for the next 2 months? Do not add any comment please nor advice or anything. Please provide the results in a valid JSON array of objects with the fields "date" (ISO date string) and "price" (number). Do not add any comment or reflexion, just the array of JSON. Do not make any advice. I just want raw datas.
+`,
 						},
 					],
 				},
 			],
 			model: 'claude-3-haiku-20240307',
 		});
+
+		console.log('Claude opinion:', message.content);
 
 		return NextResponse.json({ opinion: message.content });
 	} catch (error) {

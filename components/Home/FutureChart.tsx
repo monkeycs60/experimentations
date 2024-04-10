@@ -7,7 +7,7 @@ import TotalChart from './TotalChart';
 import { format } from 'date-fns';
 
 const claudeFuturApi = async (bitcoinPrices: BitcoinPrice[]) => {
-	const response = await fetch('/api/groq-json', {
+	const response = await fetch('/api/claude', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -41,7 +41,9 @@ const FutureChart = ({ bitcoinPrices }: FutureChartProps) => {
 
 					const futureChartData = await claudeFuturApi(bitcoinPrices);
 					console.log(futureChartData);
-					const futureChartDataParsed = JSON.parse(futureChartData);
+					const futureChartDataParsed = JSON.parse(
+						futureChartData.opinion[0].text
+					);
 					console.log(futureChartDataParsed);
 					const allChartData = [
 						...bitcoinPrices,

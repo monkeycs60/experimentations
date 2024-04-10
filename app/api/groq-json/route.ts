@@ -12,8 +12,7 @@ export async function POST(request: Request) {
 	console.log('un monde où', bitcoinPrices);
 	// const filteredBitcoinPrices = bitcoinPrices;
 	// JE VEUX récupérer la deuxième moitié du table
-	const filteredBitcoinPrices = bitcoinPrices
-		.slice(bitcoinPrices.length / 2);
+	const filteredBitcoinPrices = bitcoinPrices.slice(bitcoinPrices.length / 2);
 	console.log('filteredBitcoinPrices', filteredBitcoinPrices);
 
 	try {
