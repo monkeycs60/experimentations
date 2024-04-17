@@ -20,11 +20,34 @@ const fetchCryptoNews = async () => {
 	const data = await response.json();
 	return data.results;
 };
+const fetchCryptoNewsApi = async () => {
+	console.log('fetching crypto news');
+
+	const response = await fetch(
+		'https://cryptonews-api.com/api/v1?tickers-only=BTC&items=3&page=1&token=4bqc5f9rbnmradxp7urrqxul5n2hu5vdy7ewsy75'
+	);
+	console.log(response);
+
+	const data = await response.json();
+	return data.data;
+};
+
+const fetchGlobalCryptoMarket = async () => {
+	const response = await fetch(
+		'https://newsdata.io/api/1/news?apikey=pub_41777daa3c595ec3d4493dce3292326916674&q=pizza'
+	);
+	const data = await response.json();
+	return data;
+};
 
 const Home = async () => {
 	const bitcoinPrices = await getBitcoinHistoricalPrices();
 	const cryptoNews = await fetchCryptoNews();
 	console.log(cryptoNews);
+	const cryptoNewsApi = await fetchCryptoNewsApi();
+	console.log(cryptoNewsApi);
+	const globalCryptoMarket = await fetchGlobalCryptoMarket();
+	console.log(globalCryptoMarket);
 
 	return (
 		<main className='space-y-10'>
